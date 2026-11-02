@@ -136,6 +136,22 @@ details.fold[open]>summary .chev{transform:rotate(180deg)}
 .log .d i{font-family:var(--serif)}
 .empty{color:var(--muted);font-family:var(--serif);font-style:italic}
 footer{color:var(--muted);font-size:.78rem;text-align:center}
+
+/* one-time welcome */
+.welcome{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-top:calc(env(safe-area-inset-top,0px) + 40px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 40px);
+  padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.welcome .inner{max-width:26rem;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.welcome .wlogo{width:11rem;aspect-ratio:516/141;background:var(--ink);-webkit-mask:url(logo.png) left center/contain no-repeat;mask:url(logo.png) left center/contain no-repeat}
+.welcome .wtitle{font-size:clamp(1.9rem,8vw,2.4rem);line-height:1.2}
+.welcome em{font-family:var(--serif);font-style:italic}
+.welcome .lede{font-size:.95rem}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.steps li{display:grid;grid-template-columns:5.5rem 1fr;gap:10px;padding-top:10px;border-top:1px solid var(--line);font-size:.88rem}
+.steps li b{font-weight:500;color:var(--rust)}
+.starts{background:var(--lav);color:#3a1512;border-radius:16px;padding:14px 16px;font-family:var(--serif);font-style:italic;font-size:1.05rem}
+.sig{font-family:var(--serif);font-style:italic;color:var(--muted)}
+.linkbtn{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;font-size:.78rem}
 </style>
 </head>
 <body>
@@ -283,7 +299,33 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
     </div>
   </details>
 
-  <footer>quiet hours · phone off, tune in</footer>
+  <footer>quiet hours · phone off, tune in<br><button type="button" class="linkbtn" id="aboutBtn">about the challenge</button></footer>
+</div>
+<div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="wTitle" hidden>
+  <div class="inner">
+    <div class="wlogo logoimg" role="img" aria-label="quiet hours"></div>
+    <h2 class="wtitle" id="wTitle">welcome to quiet hours</h2>
+    <p class="lede">the last hour of your night belongs to <em>you</em>. for 14 days, we're turning our phones off an hour before bed and filling that time with stretching, rest, and the people around us.</p>
+    <p class="lede">you're joining a community going phone-free <em>together</em>. phone off, tune in.</p>
+    <ul class="steps">
+      <li><b>evening</b><span>check in, then turn your phone off for your quiet hour.</span></li>
+      <li><b>morning</b><span>after your first phone-free hour, tell us how you slept.</span></li>
+      <li><b>day 14</b><span>submit your results so we can learn from the experiment together.</span></li>
+    </ul>
+    <p class="starts">the 14-day challenge starts nov 9. get ready.</p>
+    <div class="settings">
+      <div class="field">
+        <label for="wName">my name</label>
+        <input type="text" id="wName" placeholder="first name" autocomplete="given-name">
+      </div>
+      <div class="field">
+        <label for="wBed">my bedtime</label>
+        <input type="time" id="wBed" value="22:30">
+      </div>
+    </div>
+    <button class="btn" type="button" id="wGo">i'm in</button>
+    <p class="sig">see you on the other side, akwele</p>
+  </div>
 </div>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <div class="cheer" id="cheer" role="status"></div>
@@ -542,6 +584,18 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
     try{navigator.clipboard.writeText(t).then(function(){$("xToast").textContent="copied. now tap submit on form and paste it in."},fallback)}catch(e){fallback()}
   });
 
+
+  // one-time welcome; reopen from the footer
+  function openWelcome(){$("wName").value=$("name").value;$("wBed").value=S.bedtime;$("welcome").hidden=false;document.documentElement.style.overflow="hidden";try{$("welcome").scrollTop=0}catch(e){}}
+  function closeWelcome(){$("welcome").hidden=true;document.documentElement.style.overflow=""}
+  $("wGo").addEventListener("click",function(){
+    var n=$("wName").value.trim(),b=$("wBed").value;
+    if(n){$("name").value=n;S.name=n;save("name",n)}
+    if(b){S.bedtime=b;$("bedtime").value=b;save("bedtime",b)}
+    save("welcomed",true);closeWelcome();tick();
+  });
+  $("aboutBtn").addEventListener("click",openWelcome);
+  if(!load("welcomed",false))openWelcome();
   tick();setInterval(tick,1000);
 })();
 </script>
