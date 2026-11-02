@@ -104,6 +104,7 @@ textarea{resize:vertical;min-height:3.5rem}
 .scale-ends{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)}
 .btn{border:1px solid var(--rust);background:var(--rust);color:var(--on-rust);border-radius:999px;padding:9px 16px;align-self:flex-start}
 .btn.ghost{background:transparent;color:var(--rust)}
+a.btn{text-decoration:none;display:inline-block}
 .toast{font-size:.8rem;color:var(--rust);min-height:1.2em}
 
 /* fold-away sections */
@@ -272,8 +273,11 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
   <details class="fold">
     <summary><span class="t">share your results</span><span class="chev" aria-hidden="true">▾</span></summary>
     <div class="foldbody">
-      <p class="note">after day 14, tap below and paste what's copied into a text to christina. it's everything you logged here, ready for the research.</p>
-      <button class="btn" type="button" id="exportBtn">copy my results</button>
+      <p class="note">after day 14, copy your results, then open the form and paste them in. it's everything you logged here, ready for akwele's research.</p>
+      <div class="row">
+        <button class="btn" type="button" id="exportBtn">1. copy my results</button>
+        <a class="btn ghost" href="https://docs.google.com/forms/d/e/1FAIpQLSdFcPcEd2nLUR3-45nQB8YPC4EwR9EI7hKkCRk_BXNZHnBnMg/viewform" target="_blank" rel="noopener">2. submit on form</a>
+      </div>
       <textarea id="exportBox" readonly hidden rows="6" aria-label="your results"></textarea>
       <div class="toast" id="xToast" role="status"></div>
     </div>
@@ -534,8 +538,8 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
   }
   $("exportBtn").addEventListener("click",function(){
     var t=exportText(),box=$("exportBox");box.value=t;
-    var fallback=function(){box.hidden=false;box.focus();box.select();$("xToast").textContent="your results are selected below. copy them and paste into a text to christina."};
-    try{navigator.clipboard.writeText(t).then(function(){$("xToast").textContent="copied. paste it into a text to christina."},fallback)}catch(e){fallback()}
+    var fallback=function(){box.hidden=false;box.focus();box.select();$("xToast").textContent="your results are selected below. copy them, then tap submit on form and paste them in."};
+    try{navigator.clipboard.writeText(t).then(function(){$("xToast").textContent="copied. now tap submit on form and paste it in."},fallback)}catch(e){fallback()}
   });
 
   tick();setInterval(tick,1000);
