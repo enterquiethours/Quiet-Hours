@@ -152,6 +152,8 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
 .starts{background:var(--lav);color:#3a1512;border-radius:16px;padding:14px 16px;font-family:var(--serif);font-style:italic;font-size:1.05rem}
 .sig{font-family:var(--serif);font-style:italic;color:var(--muted)}
 .linkbtn{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;font-size:.78rem}
+.jp{margin-top:8px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.jp p{font-family:var(--serif);font-style:italic;font-size:.95rem;border-left:2px solid var(--lav);padding-left:10px}
 </style>
 </head>
 <body>
@@ -160,18 +162,18 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
   <div class="stack">
     <div class="brand">
       <h1 class="logo" role="img" aria-label="quiet hours"></h1>
-      <span class="eyebrow" id="nightLabel">cohort one</span>
+      <span class="eyebrow" id="nightLabel">the boring experiment</span>
     </div>
     <div class="face" aria-live="polite">
-      <div class="state" id="state">before quiet hours</div>
+      <div class="state" id="state">your quiet hour starts in</div>
       <div class="big" id="big">--:--</div>
       <p class="sub" id="sub">until you turn your phone off</p>
       <div class="bar"><i id="barFill"></i></div>
     </div>
     <div class="streak">
-      <p id="streakText">you've kept quiet hours 0 of 14 nights</p>
+      <p id="streakText">you've kept your quiet hour 0 of 14 nights</p>
       <div class="dots" id="dots" aria-hidden="true"></div>
-      <div class="legend"><span>● kept quiet hours</span><span>◐ partly</span></div>
+      <div class="legend"><span>● kept your quiet hour</span><span>◐ partly</span></div>
     </div>
     <div class="settings">
       <div class="field">
@@ -224,7 +226,7 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
         <div class="eyebrow" id="mLabel">about last night</div>
       </div>
       <div class="field">
-        <span class="flabel">did you keep quiet hours last night?</span>
+        <span class="flabel">did you keep your quiet hour last night?</span>
         <div class="seg" id="kept">
           <button type="button" data-v="yes" aria-pressed="false">yes</button>
           <button type="button" data-v="partly" aria-pressed="false">partly</button>
@@ -299,20 +301,20 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
     </div>
   </details>
 
-  <footer>quiet hours · phone off, tune in<br><button type="button" class="linkbtn" id="aboutBtn">about the challenge</button></footer>
+  <footer>quiet hours · phone off, tune in<br><button type="button" class="linkbtn" id="aboutBtn">about the boring experiment</button></footer>
 </div>
 <div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="wTitle" hidden>
   <div class="inner">
     <div class="wlogo logoimg" role="img" aria-label="quiet hours"></div>
-    <h2 class="wtitle" id="wTitle">welcome to quiet hours</h2>
-    <p class="lede">the last hour of your night belongs to <em>you</em>. for 14 days, we're turning our phones off an hour before bed and filling that time with stretching, rest, and the people around us.</p>
+    <h2 class="wtitle" id="wTitle">welcome to <em>the boring experiment</em></h2>
+    <p class="lede">the last hour of your night belongs to <em>you</em>. in the boring experiment, we spend 14 days turning our phones off an hour before bed and filling that time with stretching, rest, and the people around us.</p>
     <p class="lede">you're joining a community going phone-free <em>together</em>. phone off, tune in.</p>
     <ul class="steps">
       <li><b>evening</b><span>check in, then turn your phone off for your quiet hour.</span></li>
       <li><b>morning</b><span>after your first phone-free hour, tell us how you slept.</span></li>
       <li><b>day 14</b><span>submit your results so we can learn from the experiment together.</span></li>
     </ul>
-    <p class="starts">the 14-day challenge starts nov 9. get ready.</p>
+    <p class="starts" id="wStarts">the boring experiment starts nov 9. get ready.</p>
     <div class="settings">
       <div class="field">
         <label for="wName">my name</label>
@@ -408,21 +410,28 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
     var now=new Date(), w=windowNow(now);
     setKeys(now);
     var n=dayNum(w.start);
-    $("nightLabel").textContent = n<1 ? "cohort one starts nov 9" : n>DAYS ? "cohort one · finished" : "cohort one · day "+n+" of "+DAYS;
-    if(w.phase==="before"){
-      $("state").textContent="before quiet hours";
+    $("nightLabel").textContent = n<1 ? "the boring experiment · starts nov 9" : n>DAYS ? "the boring experiment · finished" : "the boring experiment · day "+n+" of "+DAYS;
+    var ws=$("wStarts");if(ws)ws.textContent = n<1 ? "the boring experiment starts nov 9. get ready." : n>DAYS ? "the boring experiment has wrapped. thank you for being part of it." : "the boring experiment has started. today is day "+n+" of "+DAYS+". jump in tonight.";
+    var hr=now.getHours();
+    if(w.phase!=="during"&&hr>=4&&hr<12){
+      $("state").textContent="rise gently";
+      $("big").textContent="good morning";
+      $("sub").textContent="have a beautiful, blessed day. your quiet hour starts at "+fmtClock(w.start)+" tonight.";
+      $("barFill").style.width="0%";
+    }else if(w.phase==="before"){
+      $("state").textContent="your quiet hour starts in";
       $("big").textContent=fmtDur(w.start-now);
       $("sub").textContent="until phones go off at "+fmtClock(w.start);
       var left=w.start-now;$("barFill").style.width=left<3600000?(100-left/36000)+"%":"0%";
     }else if(w.phase==="during"){
-      $("state").textContent="quiet hours · phone off, tune in";
+      $("state").textContent="your quiet hour · phone off, tune in";
       $("big").textContent=fmtDur(w.bed-now);
       $("sub").textContent="left before bed at "+fmtClock(w.bed)+".";
       $("barFill").style.width=((now-w.start)/36000)+"%";
     }else{
       $("state").textContent="you made it to bedtime";
       $("big").textContent="good night";
-      $("sub").textContent="rest now. check in tomorrow morning.";
+      $("sub").textContent="rest well. check in when you wake up.";
       $("barFill").style.width="100%";
     }
   }
@@ -442,6 +451,22 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
 
   function setSeg(id,val){[].forEach.call($(id).children,function(b){b.setAttribute("aria-pressed",b.dataset.v===val?"true":"false")})}
 
+  // journal prompts tucked under "make"
+  function promptBox(){
+    var box=document.createElement("div");box.className="jp";
+    var t=document.createElement("button");t.type="button";t.className="linkbtn";
+    t.textContent=S.promptOpen?"hide journal prompt":"need a journal prompt?";
+    t.setAttribute("aria-expanded",S.promptOpen?"true":"false");
+    t.addEventListener("click",function(){S.promptOpen=!S.promptOpen;renderMenu()});
+    box.appendChild(t);
+    if(S.promptOpen){
+      var p=document.createElement("p");p.textContent=PROMPTS[S.promptI];box.appendChild(p);
+      var n=document.createElement("button");n.type="button";n.className="linkbtn";n.textContent="another prompt";
+      n.addEventListener("click",function(){S.promptI=(S.promptI+1)%PROMPTS.length;renderMenu()});
+      box.appendChild(n);
+    }
+    return box;
+  }
   function renderMenu(){
     var c=$("cats");c.innerHTML="";
     var cats=Object.assign({},MENU);if(S.mine.length)cats["my ideas"]=S.mine;
@@ -450,7 +475,9 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
       var h=document.createElement("h3");h.textContent=cat;w.appendChild(h);
       var ul=document.createElement("ul");ul.className="ideas";
       cats[cat].forEach(function(it){var li=document.createElement("li");if(cat==="my ideas")li.className="mine";li.textContent=it;ul.appendChild(li)});
-      w.appendChild(ul);c.appendChild(w);
+      w.appendChild(ul);
+      if(cat==="make")w.appendChild(promptBox());
+      c.appendChild(w);
     });
   }
   function renderMorning(){setSeg("kept",S.m.kept);setSeg("wakeups",S.m.wakeups);setSeg("refreshed",S.m.refreshed)}
@@ -471,13 +498,13 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
       dots.appendChild(s);
     }
     var tail=partly?" · "+partly+" partly":"";
-    $("streakText").textContent = practice ? "practice run · kept "+kept+tail+". your 14 days start nov 9." : "you've kept quiet hours "+kept+" of "+DAYS+" nights"+tail;
+    $("streakText").textContent = practice ? "practice run · kept "+kept+tail+". your 14 days start nov 9." : "you've kept your quiet hour "+kept+" of "+DAYS+" nights"+tail;
   }
 
   function celebrate(kind,k){
     try{if(navigator.vibrate)navigator.vibrate(kind==="yes"?[60,40,140]:[70])}catch(e){}
     var c=$("cheer");c.className="cheer"+(kind==="partly"?" partly":"");
-    c.textContent=kind==="yes"?"you kept quiet hours. dot added.":"partly counts. half dot added.";
+    c.textContent=kind==="yes"?"you kept your quiet hour. dot added.":"partly counts. half dot added.";
     requestAnimationFrame(function(){c.classList.add("show")});
     clearTimeout(c._t);c._t=setTimeout(function(){c.classList.remove("show")},3200);
     var still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -515,7 +542,7 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
       var ev=e.evening;
       if(ev&&ev.focus!=null){line("focus "+ev.focus+" · mood "+ev.mood+" · energy "+ev.energy+" (of 6)");if(ev.note)line(ev.note,"i")}
       if(e.morning){var m=e.morning;
-        line("quiet hours: "+({yes:"kept",partly:"partly",no:"not really"}[m.kept]||"—"));
+        line("quiet hour: "+({yes:"kept",partly:"partly",no:"not really"}[m.kept]||"—"));
         line("sleep: "+(m.slept||"?")+" → "+(m.woke||"?")+" · woke "+(m.wakeups||"?")+"× · refreshed "+(m.refreshed||"?")+"/5","note");
       }else line("morning check-in still to come","note");
       li.appendChild(n);li.appendChild(d);ul.appendChild(li);
@@ -537,7 +564,7 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
   segHandler("wakeups","wakeups");segHandler("refreshed","refreshed");
 
   $("saveMorning").addEventListener("click",function(){
-    if(!S.m.kept||!S.m.refreshed){$("mToast").textContent="answer quiet hours and how refreshed you feel to save.";return}
+    if(!S.m.kept||!S.m.refreshed){$("mToast").textContent="answer your quiet hour and how refreshed you feel to save.";return}
     upsert(cur.morningKey,"morning",morningData());
     $("mToast").textContent="saved. have a good day.";loadEntries();
   });
@@ -576,7 +603,7 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
       var e=S.days[k],ev=e.evening||{},m=e.morning||{},n=dayNum(fromKey(k));
       rows.push([name,k,(n>=1&&n<=DAYS)?n:"practice",ev.focus,ev.mood,ev.energy,ev.note||"",m.kept||"",m.slept||"",m.woke||"",m.wakeups||"",m.refreshed||""]);
     });
-    return "quiet hours results\n"+rows.map(function(r){return r.map(csvCell).join(",")}).join("\n");
+    return "the boring experiment results\n"+rows.map(function(r){return r.map(csvCell).join(",")}).join("\n");
   }
   $("exportBtn").addEventListener("click",function(){
     var t=exportText(),box=$("exportBox");box.value=t;
