@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Quiet Hours</title>
-<meta name="description" content="Your Quiet Hours tracker: phone off, tune in.">
+<meta name="description" content="The Boring Experiment by Quiet Hours: phone off, tune in.">
 <meta name="theme-color" content="#fff8c5" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#24100e" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,326 +16,319 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital@0;1&family=Roboto+Mono:wght@400;500&display=swap">
+<style>html{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
 <style>
-html{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-body{margin:0}
-img{max-width:100%}
-[hidden]{display:none!important}
-.logo{display:block;width:9.5rem;aspect-ratio:516/141;background:var(--ink);-webkit-mask:url(logo.png) center/contain no-repeat;mask:url(logo.png) center/contain no-repeat}
-/* layout: one narrow column like a phone screen; clock face and 14-day streak lead, then check-ins; the menu, nights and sharing fold away below */
+/* layout: phone app shell — today / ideas / insights views over a fixed bottom tab bar; check-ins open as full-screen one-question-per-step flows */
 :root{
   --bg:#fff8c5;--surface:#fffce6;--ink:#792920;--muted:#9a6a60;--line:#eadfa8;
-  --rust:#792920;--lav:#b3bcff;--lav-soft:#e8ebff;--on-rust:#fff8c5;
+  --rust:#792920;--lav:#b3bcff;--lav-soft:#e8ebff;--on-rust:#fff8c5;--on-lav:#3a1512;
   --serif:"Libre Baskerville",Georgia,"Times New Roman",serif;
   --mono:"Roboto Mono",ui-monospace,Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#24100e;--surface:#331a17;--ink:#fff8c5;--muted:#c9b3a6;--line:#4a2b26;
-  --rust:#e0897d;--lav:#b3bcff;--lav-soft:#2f2c48;--on-rust:#24100e;color-scheme:dark}}
+  --rust:#e0897d;--lav:#b3bcff;--lav-soft:#2f2c48;--on-rust:#24100e;--on-lav:#24100e;color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#24100e;--surface:#331a17;--ink:#fff8c5;--muted:#c9b3a6;--line:#4a2b26;
-  --rust:#e0897d;--lav:#b3bcff;--lav-soft:#2f2c48;--on-rust:#24100e;color-scheme:dark}
+  --rust:#e0897d;--lav:#b3bcff;--lav-soft:#2f2c48;--on-rust:#24100e;--on-lav:#24100e;color-scheme:dark}
 
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.6;text-transform:lowercase;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
-.app{max-width:30rem;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.55;text-transform:lowercase;-webkit-tap-highlight-color:transparent;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px calc(96px + env(safe-area-inset-bottom,0px))}
+.app{max-width:28rem;margin:0 auto}
 h1,h2,h3{font-family:var(--serif);font-style:italic;font-weight:400;margin:0;text-wrap:balance}
-h2{font-size:1.45rem}
-h3{font-size:1rem}
 p{margin:0}
-.eyebrow{font-size:.72rem;letter-spacing:.12em;color:var(--muted)}
+em{font-family:var(--serif);font-style:italic}
 button,input,textarea{font:inherit;color:inherit;text-transform:lowercase}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--lav);outline-offset:2px}
-section,.stack{display:flex;flex-direction:column;gap:12px}
+.eyebrow{font-size:.7rem;letter-spacing:.12em;color:var(--muted)}
+.note{font-size:.78rem;color:var(--muted)}
+.logo{display:block;width:8.5rem;aspect-ratio:516/141;background:var(--ink);-webkit-mask:url(logo.png) left center/contain no-repeat;mask:url(logo.png) left center/contain no-repeat}
+.view{display:flex;flex-direction:column;gap:18px}
 
-/* clock */
-.brand{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
-.brand h1{font-size:1.1rem}
-.face{position:relative;border-radius:999px 999px 24px 24px;background:var(--surface);border:1px solid var(--line);padding:44px 24px 24px;text-align:center;overflow:hidden}
-.face::before{content:"";position:absolute;inset:auto -20% -60% -20%;height:90%;background:radial-gradient(closest-side,var(--lav-soft),transparent);pointer-events:none}
-.face>*{position:relative}
-.state{font-size:.78rem;letter-spacing:.12em;color:var(--rust)}
-.big{font-family:var(--serif);font-style:italic;font-size:clamp(2.8rem,14vw,4.2rem);line-height:1.1;margin:10px 0 6px;font-variant-numeric:tabular-nums}
-.sub{color:var(--muted);max-width:28ch;margin:0 auto}
-.bar{height:4px;background:var(--line);border-radius:4px;margin:20px auto 0;max-width:16rem;overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:var(--rust);transition:width 1s linear}
-@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+/* top bar */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.iconbtn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;padding:0}
+.iconbtn svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.6}
+.hello{display:flex;flex-direction:column;gap:8px}
+.hello h1{font-size:1.65rem;line-height:1.25}
+.pill{align-self:flex-start;border-radius:999px;padding:4px 12px;font-size:.72rem;letter-spacing:.06em;background:var(--lav);color:var(--on-lav)}
+.pill.base{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+
+/* hero */
+.hero{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.ring{position:relative;width:min(220px,62vw);aspect-ratio:1;max-width:100%}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:8}
+.ring .track{stroke:var(--line)}
+.ring .prog{stroke:var(--rust);stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.ringin{position:absolute;inset:14%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.state{font-size:.68rem;letter-spacing:.12em;color:var(--rust)}
+.big{font-family:var(--serif);font-style:italic;font-size:clamp(1.9rem,10vw,2.6rem);line-height:1.1;font-variant-numeric:tabular-nums}
+.sub{color:var(--muted);font-size:.82rem;max-width:30ch}
 
 /* streak */
-.streak{display:flex;flex-direction:column;gap:10px;padding-top:4px}
-.streak p{font-family:var(--serif);font-style:italic;font-size:1.05rem}
-.dots{display:grid;grid-template-columns:repeat(14,1fr);gap:5px}
+.streak{display:flex;flex-direction:column;gap:10px}
+.streakhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.streakhead p{font-family:var(--serif);font-style:italic;font-size:1rem}
+.dots{display:grid;grid-template-columns:repeat(var(--n,14),1fr);gap:5px}
 .dots span{aspect-ratio:1;max-width:100%;border-radius:50%;border:1px solid var(--line);background:var(--surface)}
-.dots span.half{background:linear-gradient(90deg,var(--lav) 50%,var(--surface) 50%);border-color:var(--lav)}
-.dots span.full{background:var(--rust);border-color:var(--rust)}
-.dots span.today{outline:2px solid var(--lav);outline-offset:2px}
-.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.72rem;color:var(--muted)}
+.dots span.full{background:var(--lav);border-color:var(--lav)}
+.dots span.half{background:linear-gradient(90deg,var(--rust) 50%,var(--surface) 50%);border-color:var(--rust)}
+.dots span.logged{background:var(--muted);border-color:var(--muted)}
+.dots span.today{outline:2px solid var(--rust);outline-offset:2px}
+.dots.base{--n:6;max-width:14rem}
 .dots span.pop{animation:pop .7s cubic-bezier(.3,1.6,.5,1)}
 @keyframes pop{0%{transform:scale(.2)}60%{transform:scale(1.5)}100%{transform:scale(1)}}
-#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
-.cheer{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;z-index:51;background:var(--rust);color:var(--on-rust);border-radius:999px;padding:12px 20px;font-family:var(--serif);font-style:italic;font-size:1rem;max-width:calc(100% - 32px);text-align:center;transition:opacity .3s,transform .3s;pointer-events:none}
-.cheer.show{opacity:1;transform:translate(-50%,0)}
-.cheer.partly{background:var(--lav);color:#3a1512}
-@media (prefers-reduced-motion:reduce){.dots span.pop{animation:none}.cheer{transition:none}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.7rem;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
 
-.settings{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
-.field{display:flex;flex-direction:column;gap:6px;flex:1 1 9rem;min-width:0}
-.field>label,.flabel{font-size:.72rem;letter-spacing:.12em;color:var(--muted)}
-input[type=time],input[type=text],textarea{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%}
-textarea{resize:vertical;min-height:3.5rem}
-.note{font-size:.8rem;color:var(--muted)}
+/* check-in cards */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:8px;text-align:left;min-width:0}
+.card.next{background:var(--rust);border-color:var(--rust);color:var(--on-rust)}
+.card.next .note{color:var(--on-rust);opacity:.8}
+.card h3{font-size:1.02rem}
+.card .go{margin-top:auto;font-size:.75rem;letter-spacing:.06em}
+.card.done .go{color:var(--muted)}
+.cardicon{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--bg)}
+.card.next .cardicon{background:var(--on-rust)}
+.cardicon svg{width:16px;height:16px;stroke:var(--rust);fill:none;stroke-width:1.7}
 
-/* check-in */
-.tabs{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
-.tabs button{border:0;background:transparent;border-radius:999px;padding:8px 6px;font-size:.82rem}
-.tabs button[aria-selected="true"]{background:var(--rust);color:var(--on-rust)}
-.panel{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px}
-.panel .field{gap:4px}
-.panel>.field{flex:none}
-.panel input[type=time],.panel input[type=text],.panel textarea{background:var(--bg)}
-.pair{display:flex;gap:10px;flex-wrap:wrap}
-.seg{display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:5px}
-.seg button{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 2px;font-size:.82rem;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
-.seg button small{font-size:.58rem;line-height:1.2;color:var(--muted);overflow-wrap:anywhere}
-.seg button[aria-pressed="true"]{background:var(--rust);border-color:var(--rust);color:var(--on-rust)}
-.seg button[aria-pressed="true"] small{color:var(--on-rust)}
-.scale-ends{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)}
-.btn{border:1px solid var(--rust);background:var(--rust);color:var(--on-rust);border-radius:999px;padding:9px 16px;align-self:flex-start}
+/* buttons */
+.btn{border:1px solid var(--rust);background:var(--rust);color:var(--on-rust);border-radius:999px;padding:11px 18px;text-decoration:none;display:inline-block;text-align:center}
 .btn.ghost{background:transparent;color:var(--rust)}
-a.btn{text-decoration:none;display:inline-block}
+.btn.wide{width:100%}
+.linkbtn{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;font-size:.78rem}
 .toast{font-size:.8rem;color:var(--rust);min-height:1.2em}
 
-/* fold-away sections */
-details.fold{border:1px solid var(--line);border-radius:18px;background:var(--surface)}
-details.fold>summary{list-style:none;cursor:pointer;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-details.fold>summary::-webkit-details-marker{display:none}
-details.fold>summary .t{font-family:var(--serif);font-style:italic;font-size:1.1rem}
-details.fold>summary .chev{color:var(--rust);transition:transform .2s}
-details.fold[open]>summary .chev{transform:rotate(180deg)}
-.foldbody{display:flex;flex-direction:column;gap:18px;padding:0 18px 18px}
-.pick{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--lav-soft);border-radius:14px;padding:14px}
-.pick p{flex:1 1 12rem;font-family:var(--serif);font-style:italic;font-size:1.05rem;min-width:0}
-.prompt{border-left:2px solid var(--lav);padding:2px 0 2px 14px;display:flex;flex-direction:column;gap:8px}
-.prompt p{font-family:var(--serif);font-style:italic;font-size:1rem}
-.cat h3{margin-bottom:6px}
-.cats{display:flex;flex-direction:column;gap:14px}
+/* ideas */
+.shuffle{background:var(--lav);color:var(--on-lav);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.shuffle p{font-family:var(--serif);font-style:italic;font-size:1.3rem;line-height:1.3;min-height:2.6em}
+.shuffle .btn{background:var(--on-lav);border-color:var(--on-lav);color:var(--lav);align-self:flex-start}
+.cat{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
 .ideas{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
 .ideas li{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:5px 12px;font-size:.8rem}
 .ideas li.mine{border-style:dashed}
+.jp{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.jp p{font-family:var(--serif);font-style:italic;font-size:.95rem;border-left:2px solid var(--lav);padding-left:10px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
-.row input{flex:1 1 12rem;min-width:0}
+.row input{flex:1 1 11rem;min-width:0}
+input[type=time],input[type=text],textarea{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px;width:100%}
+textarea{resize:vertical;min-height:6rem}
 
-/* log */
+/* insights */
+.summary{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.summary p.lead{font-family:var(--serif);font-style:italic;font-size:1.08rem;line-height:1.45}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tile .v{font-family:var(--serif);font-style:italic;font-size:1.6rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile .v small{font-family:var(--mono);font-style:normal;font-size:.72rem;color:var(--muted);margin-left:3px}
+.tile .d{font-size:.72rem;color:var(--muted)}
+.tile.kept{grid-column:1/-1;background:var(--lav);border-color:var(--lav);color:var(--on-lav)}
+.tile.kept .d,.tile.kept .eyebrow,.tile.kept .v small{color:var(--on-lav)}
+.cmp{width:100%;border-collapse:collapse;font-size:.82rem;font-variant-numeric:tabular-nums}
+.cmp th{font-weight:400;font-size:.66rem;letter-spacing:.1em;color:var(--muted);text-align:right;padding:0 0 8px}
+.cmp th:first-child,.cmp td:first-child{text-align:left}
+.cmp td{padding:9px 0;border-top:1px solid var(--line);text-align:right}
+.cmp td.ch{color:var(--rust)}
+.tablewrap{overflow-x:auto}
+details.fold{border:1px solid var(--line);border-radius:20px;background:var(--surface)}
+details.fold>summary{list-style:none;cursor:pointer;padding:15px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary .t{font-family:var(--serif);font-style:italic;font-size:1.05rem}
+details.fold>summary .chev{color:var(--rust);transition:transform .2s}
+details.fold[open]>summary .chev{transform:rotate(180deg)}
+.foldbody{display:flex;flex-direction:column;gap:14px;padding:0 16px 16px}
 .log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-.log li{display:grid;grid-template-columns:5rem 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
-.log li:last-child{border-bottom:1px solid var(--line)}
-.log .n{color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums}
-.log .d{min-width:0;display:flex;flex-direction:column;gap:2px;font-size:.85rem}
+.log li{display:grid;grid-template-columns:5.6rem 1fr;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
+.log .n{color:var(--muted);font-size:.74rem}
+.log .d{min-width:0;display:flex;flex-direction:column;gap:2px;font-size:.82rem}
 .log .d i{font-family:var(--serif)}
 .empty{color:var(--muted);font-family:var(--serif);font-style:italic}
-footer{color:var(--muted);font-size:.78rem;text-align:center}
+.submit{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.submit ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px;font-size:.82rem}
 
-/* one-time welcome */
-.welcome{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding-top:calc(env(safe-area-inset-top,0px) + 40px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 40px);
-  padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
-.welcome .inner{max-width:26rem;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-.welcome .wlogo{width:11rem;aspect-ratio:516/141;background:var(--ink);-webkit-mask:url(logo.png) left center/contain no-repeat;mask:url(logo.png) left center/contain no-repeat}
-.welcome .wtitle{font-size:clamp(1.9rem,8vw,2.4rem);line-height:1.2}
-.welcome em{font-family:var(--serif);font-style:italic}
-.welcome .lede{font-size:.95rem}
-.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
-.steps li{display:grid;grid-template-columns:5.5rem 1fr;gap:10px;padding-top:10px;border-top:1px solid var(--line);font-size:.88rem}
-.steps li b{font-weight:500;color:var(--rust)}
-.starts{background:var(--lav);color:#3a1512;border-radius:16px;padding:14px 16px;font-family:var(--serif);font-style:italic;font-size:1.05rem}
+/* tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);
+  padding:8px max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.tabbar .in{max-width:28rem;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tabbar button{border:0;background:transparent;border-radius:14px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.7rem;color:var(--muted)}
+.tabbar svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6}
+.tabbar button[aria-selected="true"]{color:var(--rust);background:var(--bg)}
+
+/* full-screen sheets: flow, settings, welcome */
+.sheet{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-top:calc(env(safe-area-inset-top,0px) + 16px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet .inner{max-width:28rem;margin:0 auto;display:flex;flex-direction:column;gap:18px;min-height:100%}
+.flowtop{display:flex;align-items:center;gap:10px}
+.prog{flex:1;display:grid;grid-template-columns:repeat(var(--n,4),1fr);gap:4px}
+.prog i{height:4px;border-radius:4px;background:var(--line)}
+.prog i.on{background:var(--rust)}
+.ctx{font-size:.7rem;letter-spacing:.12em;color:var(--muted)}
+.q{font-size:clamp(1.5rem,7vw,1.9rem);line-height:1.25}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:center;gap:14px;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:12px 14px;text-align:left;width:100%}
+.opt .num{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--bg);font-variant-numeric:tabular-nums}
+.opt .lbl{display:flex;flex-direction:column;min-width:0}
+.opt .lbl small{color:var(--muted);font-size:.74rem}
+.opt[aria-pressed="true"]{background:var(--rust);border-color:var(--rust);color:var(--on-rust)}
+.opt[aria-pressed="true"] .num{background:var(--on-rust);color:var(--rust)}
+.opt[aria-pressed="true"] small{color:var(--on-rust)}
+.timebox input{font-size:1.4rem;padding:14px;text-align:center}
+.spacer{flex:1}
+.fin{align-items:center;text-align:center;justify-content:center}
+.check{width:84px;height:84px;border-radius:50%;background:var(--lav);display:grid;place-items:center}
+.check svg{width:40px;height:40px;stroke:var(--on-lav);fill:none;stroke-width:2.2}
+.fin .q{max-width:18ch}
+.fin .dots{width:100%}
+.field{display:flex;flex-direction:column;gap:5px;flex:1 1 9rem;min-width:0}
+.field>label{font-size:.7rem;letter-spacing:.12em;color:var(--muted)}
+.pair{display:flex;gap:10px;flex-wrap:wrap}
+.wlogo{width:10rem}
+.timeline{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.timeline li{display:grid;grid-template-columns:7.2rem 1fr;gap:10px;padding-top:10px;border-top:1px solid var(--line);font-size:.84rem}
+.timeline b{font-weight:500;color:var(--rust);display:flex;flex-direction:column}
+.timeline b span{font-weight:400;color:var(--muted);font-size:.72rem}
+.starts{background:var(--lav);color:var(--on-lav);border-radius:16px;padding:14px 16px;font-family:var(--serif);font-style:italic;font-size:1.02rem}
 .sig{font-family:var(--serif);font-style:italic;color:var(--muted)}
-.linkbtn{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;font-size:.78rem}
-.jp{margin-top:8px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
-.jp p{font-family:var(--serif);font-style:italic;font-size:.95rem;border-left:2px solid var(--lav);padding-left:10px}
+
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+.cheer{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;z-index:51;background:var(--lav);color:var(--on-lav);border-radius:999px;padding:12px 20px;font-family:var(--serif);font-style:italic;font-size:1rem;max-width:calc(100% - 32px);text-align:center;transition:opacity .3s,transform .3s;pointer-events:none}
+.cheer.show{opacity:1;transform:translate(-50%,0)}
+.cheer.partly{background:var(--rust);color:var(--on-rust)}
+@media (prefers-reduced-motion:reduce){.dots span.pop{animation:none}.cheer,.ring .prog{transition:none}}
 </style>
-</head>
-<body>
 
 <div class="app">
-  <div class="stack">
-    <div class="brand">
-      <h1 class="logo" role="img" aria-label="quiet hours"></h1>
-      <span class="eyebrow" id="nightLabel">the boring experiment</span>
+  <!-- TODAY -->
+  <main class="view" id="vToday">
+    <div class="top">
+      <div class="logo" role="img" aria-label="quiet hours"></div>
+      <button class="iconbtn" type="button" id="openSettings" aria-label="settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
     </div>
-    <div class="face" aria-live="polite">
-      <div class="state" id="state">your quiet hour starts in</div>
-      <div class="big" id="big">--:--</div>
-      <p class="sub" id="sub">until you turn your phone off</p>
-      <div class="bar"><i id="barFill"></i></div>
+    <div class="hello">
+      <h1 id="greet">good evening</h1>
+      <span class="pill" id="phasePill">the boring experiment</span>
     </div>
+    <div class="hero" aria-live="polite">
+      <div class="ring">
+        <svg viewBox="0 0 200 200" aria-hidden="true"><circle class="track" cx="100" cy="100" r="88"/><circle class="prog" id="ringProg" cx="100" cy="100" r="88" stroke-dasharray="552.9" stroke-dashoffset="552.9"/></svg>
+        <div class="ringin">
+          <div class="state" id="state"></div>
+          <div class="big" id="big">--:--</div>
+        </div>
+      </div>
+      <p class="sub" id="sub"></p>
+    </div>
+    <div class="cards" id="cards"></div>
     <div class="streak">
-      <p id="streakText">you've kept your quiet hour 0 of 14 nights</p>
+      <div class="streakhead"><p id="streakText"></p><span class="note" id="streakNote"></span></div>
       <div class="dots" id="dots" aria-hidden="true"></div>
-      <div class="legend"><span>● kept your quiet hour</span><span>◐ partly</span></div>
+      <div class="legend" id="legend"></div>
     </div>
-    <div class="settings">
-      <div class="field">
-        <label for="bedtime">my bedtime</label>
-        <input type="time" id="bedtime" value="22:30">
-      </div>
-      <div class="field">
-        <label for="name">my name</label>
-        <input type="text" id="name" placeholder="first name" autocomplete="given-name">
-      </div>
-    </div>
-  </div>
+  </main>
 
-  <section aria-labelledby="ciH">
-    <div>
-      <div class="eyebrow">check in</div>
-      <h2 id="ciH">how it's going</h2>
+  <!-- IDEAS -->
+  <main class="view" id="vIdeas" hidden>
+    <div class="hello"><span class="eyebrow">dopamine menu</span><h1>need ideas for tonight?</h1></div>
+    <div class="shuffle">
+      <span class="eyebrow" style="color:inherit">try this</span>
+      <p id="pickText">tap below for an idea</p>
+      <button class="btn" id="pickBtn" type="button">pick one for me</button>
     </div>
-    <div class="tabs" role="tablist">
-      <button type="button" role="tab" id="tabEvening" aria-selected="false">evening</button>
-      <button type="button" role="tab" id="tabMorning" aria-selected="true">morning</button>
+    <div id="cats" class="view" style="gap:10px"></div>
+    <div class="row">
+      <input type="text" id="addIdea" placeholder="add your own idea" maxlength="60" aria-label="add your own idea">
+      <button class="btn ghost" id="addBtn" type="button">add</button>
     </div>
+  </main>
 
-    <div class="panel" id="eveningPanel" role="tabpanel" aria-labelledby="tabEvening" hidden>
-      <div>
-        <div class="eyebrow" id="eLabel">today</div>
-      </div>
-      <div class="field">
-        <span class="flabel">how focused did you feel today?</span>
-        <div class="seg" id="focus" style="--n:6"></div>
-      </div>
-      <div class="field">
-        <span class="flabel">what was your mood like today?</span>
-        <div class="seg" id="mood" style="--n:6"></div>
-      </div>
-      <div class="field">
-        <span class="flabel">what was your energy level?</span>
-        <div class="seg" id="energy" style="--n:6"></div>
-      </div>
-      <div class="field">
-        <label for="eNote">anything you noticed about today?</label>
-        <textarea id="eNote" maxlength="400" placeholder="reached for my phone less after dinner."></textarea>
-      </div>
-      <button class="btn" type="button" id="saveEvening">save evening check-in</button>
-      <div class="toast" id="eToast" role="status"></div>
+  <!-- INSIGHTS -->
+  <main class="view" id="vInsights" hidden>
+    <div class="hello"><span class="eyebrow">insights</span><h1>your results</h1></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="summary">
+      <span class="eyebrow">before and after</span>
+      <div class="tablewrap"><table class="cmp" id="cmp"></table></div>
+      <p class="note">baseline is your normal week. experiment is your 14 nights with a quiet hour.</p>
     </div>
-
-    <div class="panel" id="morningPanel" role="tabpanel" aria-labelledby="tabMorning">
-      <div>
-        <div class="eyebrow" id="mLabel">about last night</div>
-      </div>
-      <div class="field">
-        <span class="flabel">did you keep your quiet hour last night?</span>
-        <div class="seg" id="kept">
-          <button type="button" data-v="yes" aria-pressed="false">yes</button>
-          <button type="button" data-v="partly" aria-pressed="false">partly</button>
-          <button type="button" data-v="no" aria-pressed="false">not really</button>
-        </div>
-      </div>
-      <div class="pair">
-        <div class="field">
-          <label for="slept">fell asleep around</label>
-          <input type="time" id="slept">
-        </div>
-        <div class="field">
-          <label for="woke">woke up at</label>
-          <input type="time" id="woke">
-        </div>
-      </div>
-      <div class="field">
-        <span class="flabel">times you woke up in the night</span>
-        <div class="seg" id="wakeups" style="--n:4">
-          <button type="button" data-v="0" aria-pressed="false">0</button>
-          <button type="button" data-v="1" aria-pressed="false">1</button>
-          <button type="button" data-v="2" aria-pressed="false">2</button>
-          <button type="button" data-v="3+" aria-pressed="false">3+</button>
-        </div>
-      </div>
-      <div class="field">
-        <span class="flabel">how refreshed do you feel?</span>
-        <div class="seg" id="refreshed" style="--n:5">
-          <button type="button" data-v="1" aria-pressed="false">1</button>
-          <button type="button" data-v="2" aria-pressed="false">2</button>
-          <button type="button" data-v="3" aria-pressed="false">3</button>
-          <button type="button" data-v="4" aria-pressed="false">4</button>
-          <button type="button" data-v="5" aria-pressed="false">5</button>
-        </div>
-        <div class="scale-ends"><span>groggy</span><span>fully rested</span></div>
-      </div>
-      <button class="btn" type="button" id="saveMorning">save morning check-in</button>
-      <div class="toast" id="mToast" role="status"></div>
-    </div>
-  </section>
-
-  <details class="fold" id="menuFold">
-    <summary><span class="t">need ideas for tonight?</span><span class="chev" aria-hidden="true">▾</span></summary>
-    <div class="foldbody">
-      <div class="pick">
-        <p id="pickText">tap for an idea</p>
-        <button class="btn" id="pickBtn" type="button">pick one for me</button>
-      </div>
-      <div class="cats" id="cats"></div>
-      <div class="row">
-        <input type="text" id="addIdea" placeholder="add your own idea" maxlength="60">
-        <button class="btn ghost" id="addBtn" type="button">add</button>
-      </div>
-    </div>
-  </details>
-
-  <details class="fold">
-    <summary><span class="t">my nights</span><span class="chev" aria-hidden="true">▾</span></summary>
-    <div class="foldbody"><ul class="log" id="log"></ul></div>
-  </details>
-
-  <details class="fold">
-    <summary><span class="t">share your results</span><span class="chev" aria-hidden="true">▾</span></summary>
-    <div class="foldbody">
-      <p class="note">after day 14, copy your results, then open the form and paste them in. it's everything you logged here, ready for akwele's research.</p>
+    <details class="fold">
+      <summary><span class="t">my nights</span><span class="chev" aria-hidden="true">▾</span></summary>
+      <div class="foldbody"><ul class="log" id="log"></ul></div>
+    </details>
+    <div class="submit">
+      <h2 style="font-size:1.25rem">share your results</h2>
+      <ol id="submitSteps"></ol>
       <div class="row">
         <button class="btn" type="button" id="exportBtn">1. copy my results</button>
-        <a class="btn ghost" href="https://docs.google.com/forms/d/e/1FAIpQLSdFcPcEd2nLUR3-45nQB8YPC4EwR9EI7hKkCRk_BXNZHnBnMg/viewform" target="_blank" rel="noopener">2. submit on form</a>
+        <a class="btn ghost" id="formLink" href="#" target="_blank" rel="noopener">2. submit on form</a>
       </div>
       <textarea id="exportBox" readonly hidden rows="6" aria-label="your results"></textarea>
       <div class="toast" id="xToast" role="status"></div>
     </div>
-  </details>
-
-  <footer>quiet hours · phone off, tune in<br><button type="button" class="linkbtn" id="aboutBtn">about the boring experiment</button></footer>
+  </main>
 </div>
-<div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="wTitle" hidden>
+
+<nav class="tabbar" aria-label="sections">
+  <div class="in" role="tablist">
+    <button type="button" role="tab" data-view="vToday" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>today</button>
+    <button type="button" role="tab" data-view="vIdeas" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z"/></svg>ideas</button>
+    <button type="button" role="tab" data-view="vInsights" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>insights</button>
+  </div>
+</nav>
+
+<!-- check-in flow -->
+<div class="sheet" id="flow" role="dialog" aria-modal="true" aria-labelledby="flowQ" hidden>
+  <div class="inner" id="flowInner"></div>
+</div>
+
+<!-- settings -->
+<div class="sheet" id="settings" role="dialog" aria-modal="true" aria-labelledby="setH" hidden>
   <div class="inner">
-    <div class="wlogo logoimg" role="img" aria-label="quiet hours"></div>
-    <h2 class="wtitle" id="wTitle">welcome to <em>the boring experiment</em></h2>
-    <p class="lede">the last hour of your night belongs to <em>you</em>. in the boring experiment, we spend 14 days turning our phones off an hour before bed and filling that time with stretching, rest, and the people around us.</p>
-    <p class="lede">you're joining a community going phone-free <em>together</em>. phone off, tune in.</p>
-    <ul class="steps">
-      <li><b>evening</b><span>check in, then turn your phone off for your quiet hour.</span></li>
-      <li><b>morning</b><span>after your first phone-free hour, tell us how you slept.</span></li>
-      <li><b>day 14</b><span>submit your results so we can learn from the experiment together.</span></li>
-    </ul>
-    <p class="starts" id="wStarts">the boring experiment starts nov 9. get ready.</p>
-    <div class="settings">
-      <div class="field">
-        <label for="wName">my name</label>
-        <input type="text" id="wName" placeholder="first name" autocomplete="given-name">
-      </div>
-      <div class="field">
-        <label for="wBed">my bedtime</label>
-        <input type="time" id="wBed" value="22:30">
-      </div>
+    <div class="flowtop"><h2 id="setH" style="flex:1;font-size:1.5rem">settings</h2><button class="iconbtn" type="button" id="closeSettings" aria-label="close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="field"><label for="sName">my name</label><input type="text" id="sName" placeholder="first name" autocomplete="given-name"></div>
+    <div class="field"><label for="sBed">my bedtime</label><input type="time" id="sBed" value="22:30"></div>
+    <p class="note">your quiet hour is the hour before this bedtime.</p>
+    <button class="btn" type="button" id="saveSettings">save</button>
+    <button class="linkbtn" type="button" id="aboutBtn" style="align-self:flex-start">about the boring experiment</button>
+  </div>
+</div>
+
+<!-- one-time welcome -->
+<div class="sheet" id="welcome" role="dialog" aria-modal="true" aria-labelledby="wTitle" hidden>
+  <div class="inner">
+    <div class="logo wlogo" role="img" aria-label="quiet hours"></div>
+    <h1 class="q" id="wTitle">welcome to <em>the boring experiment</em></h1>
+    <p>the last hour of your night belongs to <em>you</em>. for 14 nights, we're turning our phones off an hour before bed and filling that time with stretching, rest, and the people around us. you're joining a community going phone-free <em>together</em>.</p>
+    <ul class="timeline" id="timeline"></ul>
+    <p class="starts" id="wStarts"></p>
+    <div class="pair">
+      <div class="field"><label for="wName">my name</label><input type="text" id="wName" placeholder="first name" autocomplete="given-name"></div>
+      <div class="field"><label for="wBed">my bedtime</label><input type="time" id="wBed" value="22:30"></div>
     </div>
-    <button class="btn" type="button" id="wGo">i'm in</button>
+    <button class="btn wide" type="button" id="wGo">i'm in</button>
     <p class="sig">see you on the other side, akwele</p>
   </div>
 </div>
+
 <canvas id="confetti" aria-hidden="true"></canvas>
 <div class="cheer" id="cheer" role="status"></div>
 
 <script>
 (function(){
-  var COHORT_START = new Date(2026,10,9); // day 1 = night of nov 9, 2026
+  // ---- experiment calendar (edit these for a new cohort) ----
+  var BASE_START = new Date(2026,10,9);   // baseline week: nights of nov 9–14
+  var EXP_START  = new Date(2026,10,15);  // experiment: nights of nov 15–28
   var DAYS = 14;
+  var FORM = "https://docs.google.com/forms/d/e/1FAIpQLSdFcPcEd2nLUR3-45nQB8YPC4EwR9EI7hKkCRk_BXNZHnBnMg/viewform";
+
   var MENU = {
     "move": ["slow floor stretch","roll around on the floor","free move to one song","legs up the wall","foam roll your legs"],
     "rest": ["ten slow breaths","pray or sit in silence","warm shower, lights low","look out the window","read a paper book"],
@@ -350,43 +343,43 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
   var SCALES = {
     focus:  ["very scattered","scattered","a bit distracted","steady","focused","lightning sharp"],
     mood:   ["irritable, anxious","on edge","low","okay","at ease","calm, content"],
-    energy: ["completely drained","pretty tired","somewhat sluggish","okay","great","energized"]
+    energy: ["completely drained","pretty tired","somewhat sluggish","okay","great","energized"],
+    refreshed: ["groggy","sluggish","okay","rested","fully rested"]
   };
 
   function load(k,d){try{var v=localStorage.getItem("qh."+k);return v==null?d:JSON.parse(v)}catch(e){return d}}
   function save(k,v){try{localStorage.setItem("qh."+k,JSON.stringify(v))}catch(e){}}
   var $=function(id){return document.getElementById(id)};
+  function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
 
-  var S = {
-    bedtime: load("bedtime","22:30"), name: load("name",""),
-    mine: load("mine",[]), days: load("days",{}),
-    m: {kept:null,wakeups:null,refreshed:null}, e: {focus:null,mood:null,energy:null},
-    promptI: 0
-  };
-  $("bedtime").value=S.bedtime; $("name").value=S.name;
+  var S={bedtime:load("bedtime","22:30"),name:load("name",""),mine:load("mine",[]),days:load("days",{}),promptOpen:false,promptI:0};
 
-  // build the three 1–6 scales with a short label under each number
-  Object.keys(SCALES).forEach(function(id){
-    var wrap=$(id);
-    SCALES[id].forEach(function(lbl,i){
-      var v=i+1;
-      var b=document.createElement("button");b.type="button";b.dataset.v=String(v);b.setAttribute("aria-pressed","false");
-      b.setAttribute("aria-label",v+", "+lbl);
-      var n=document.createElement("span");n.textContent=v;var s=document.createElement("small");s.textContent=lbl;
-      b.appendChild(n);b.appendChild(s);
-      b.addEventListener("click",function(){S.e[id]=S.e[id]===b.dataset.v?null:b.dataset.v;renderEvening()});
-      wrap.appendChild(b);
-    });
-  });
-
+  // ---- dates ----
   function pad(n){return String(n).padStart(2,"0")}
+  function sod(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
   function key(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
   function fromKey(k){var p=k.split("-");return new Date(+p[0],+p[1]-1,+p[2])}
   function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x}
+  function dayDiff(a,b){return Math.round((sod(a)-sod(b))/864e5)}
+  var BASE_N=dayDiff(EXP_START,BASE_START);
   function fmtClock(d){var h=d.getHours(),m=d.getMinutes(),ap=h>=12?"pm":"am";h=h%12||12;return h+":"+pad(m)+" "+ap}
-  function fmtDur(ms){var s=Math.max(0,Math.round(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;return h>0?h+":"+pad(m)+":"+pad(sec):pad(m)+":"+pad(sec)}
-  function dayNum(d){var a=new Date(d.getFullYear(),d.getMonth(),d.getDate());return Math.round((a-COHORT_START)/86400000)+1}
-  function dayName(n,d){return (n>=1&&n<=DAYS)?"day "+n:d.toLocaleDateString("en-US",{month:"short",day:"numeric"}).toLowerCase()+" · practice"}
+  function fmtDur(ms){var s=Math.max(0,Math.round(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h>0?h+":"+pad(m)+":"+pad(x):pad(m)+":"+pad(x)}
+  function fmtShort(d){return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}).toLowerCase()}
+  function fmtMD(d){return d.toLocaleDateString("en-US",{month:"short",day:"numeric"}).toLowerCase()}
+  function toMin(t){var p=String(t).split(":");return (+p[0])*60+(+p[1])}
+  function fmtHM(h){if(h==null)return "—";var m=Math.round(h*60);return Math.floor(m/60)+"h "+pad(m%60)+"m"}
+
+  // phase of a night (the date the evening falls on)
+  function phaseOf(d){
+    var e=dayDiff(d,EXP_START);
+    if(e>=0&&e<DAYS)return {p:"experiment",n:e+1};
+    if(e>=DAYS)return {p:"after",n:e+1};
+    var b=dayDiff(d,BASE_START);
+    if(b>=0)return {p:"baseline",n:b+1};
+    return {p:"test",n:0};
+  }
+  function nightName(k){var d=fromKey(k),ph=phaseOf(d);
+    return ph.p==="experiment"?"day "+ph.n:ph.p==="baseline"?"baseline "+ph.n:ph.p==="test"?"test · "+fmtMD(d):"after · "+fmtMD(d)}
 
   function windowNow(now){
     var p=S.bedtime.split(":"),bh=+p[0],bm=+p[1];
@@ -398,232 +391,391 @@ footer{color:var(--muted);font-size:.78rem;text-align:center}
     return {start:s,bed:b,phase:now<s?"before":now<b?"during":"after"};
   }
 
-  // a "day" = one night: evening check-in on that date + morning check-in the next day
-  var cur={eveningKey:null,morningKey:null};
-  function setKeys(now){
-    var today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    var ek=key(today), mk=key(addDays(today,-1));
-    if(ek!==cur.eveningKey||mk!==cur.morningKey){cur.eveningKey=ek;cur.morningKey=mk;loadEntries();}
-  }
-
-  function tick(){
-    var now=new Date(), w=windowNow(now);
-    setKeys(now);
-    var n=dayNum(w.start);
-    $("nightLabel").textContent = n<1 ? "the boring experiment · starts nov 9" : n>DAYS ? "the boring experiment · finished" : "the boring experiment · day "+n+" of "+DAYS;
-    var ws=$("wStarts");if(ws)ws.textContent = n<1 ? "the boring experiment starts nov 9. get ready." : n>DAYS ? "the boring experiment has wrapped. thank you for being part of it." : "the boring experiment has started. today is day "+n+" of "+DAYS+". jump in tonight.";
-    var hr=now.getHours();
-    if(w.phase!=="during"&&hr>=4&&hr<12){
-      $("state").textContent="rise gently";
-      $("big").textContent="good morning";
-      $("sub").textContent="have a beautiful, blessed day. your quiet hour starts at "+fmtClock(w.start)+" tonight.";
-      $("barFill").style.width="0%";
-    }else if(w.phase==="before"){
-      $("state").textContent="your quiet hour starts in";
-      $("big").textContent=fmtDur(w.start-now);
-      $("sub").textContent="until phones go off at "+fmtClock(w.start);
-      var left=w.start-now;$("barFill").style.width=left<3600000?(100-left/36000)+"%":"0%";
-    }else if(w.phase==="during"){
-      $("state").textContent="your quiet hour · phone off, tune in";
-      $("big").textContent=fmtDur(w.bed-now);
-      $("sub").textContent="left before bed at "+fmtClock(w.bed)+".";
-      $("barFill").style.width=((now-w.start)/36000)+"%";
-    }else{
-      $("state").textContent="you made it to bedtime";
-      $("big").textContent="good night";
-      $("sub").textContent="rest well. check in when you wake up.";
-      $("barFill").style.width="100%";
-    }
-  }
-
   function entry(k){return S.days[k]||{}}
-  function loadEntries(){
-    var me=entry(cur.morningKey).morning, ev=entry(cur.eveningKey).evening;
-    S.m={kept:me?me.kept:null,wakeups:me?me.wakeups:null,refreshed:me?me.refreshed:null};
-    $("slept").value=me&&me.slept||""; $("woke").value=me&&me.woke||"";
-    S.e={focus:ev&&ev.focus!=null?String(ev.focus):null,mood:ev&&ev.mood!=null?String(ev.mood):null,energy:ev&&ev.energy!=null?String(ev.energy):null};
-    $("eNote").value=ev&&ev.note||"";
-    var md=fromKey(cur.morningKey), ed=fromKey(cur.eveningKey);
-    $("mLabel").textContent="about last night · "+dayName(dayNum(md),md)+(me&&me.refreshed?" · saved":"");
-    $("eLabel").textContent="today · "+dayName(dayNum(ed),ed)+(ev&&ev.focus!=null?" · saved":"");
-    renderAll();
-  }
+  function upsert(k,part,val){var e=Object.assign({},S.days[k]||{});e[part]=Object.assign({},e[part]||{},val);S.days[k]=e;save("days",S.days)}
+  function eveningDone(k){var e=entry(k).evening;return !!(e&&e.focus!=null)}
+  function morningDone(k){var m=entry(k).morning;return !!(m&&m.refreshed)}
 
-  function setSeg(id,val){[].forEach.call($(id).children,function(b){b.setAttribute("aria-pressed",b.dataset.v===val?"true":"false")})}
+  var cur={ek:null,mk:null};
+  function keysNow(){var t=sod(new Date());return {ek:key(t),mk:key(addDays(t,-1))}}
 
-  // journal prompts tucked under "make"
-  function promptBox(){
-    var box=document.createElement("div");box.className="jp";
-    var t=document.createElement("button");t.type="button";t.className="linkbtn";
-    t.textContent=S.promptOpen?"hide journal prompt":"need a journal prompt?";
-    t.setAttribute("aria-expanded",S.promptOpen?"true":"false");
-    t.addEventListener("click",function(){S.promptOpen=!S.promptOpen;renderMenu()});
-    box.appendChild(t);
-    if(S.promptOpen){
-      var p=document.createElement("p");p.textContent=PROMPTS[S.promptI];box.appendChild(p);
-      var n=document.createElement("button");n.type="button";n.className="linkbtn";n.textContent="another prompt";
-      n.addEventListener("click",function(){S.promptI=(S.promptI+1)%PROMPTS.length;renderMenu()});
-      box.appendChild(n);
+  // ---- today ----
+  var C=2*Math.PI*88;
+  function setRing(f){$("ringProg").style.strokeDashoffset=String(C*(1-Math.max(0,Math.min(1,f))))}
+
+  function renderHero(){
+    var now=new Date(),w=windowNow(now),hr=now.getHours();
+    var tonight=phaseOf(w.start);
+    var st="",big="",sub="",ring=0;
+    if(tonight.p==="experiment"){
+      if(w.phase!=="during"&&hr>=4&&hr<12){st="rise gently";big="good morning";sub="have a beautiful, blessed day. your quiet hour starts at "+fmtClock(w.start)+" tonight.";ring=0}
+      else if(w.phase==="before"){var left=w.start-now;st="quiet hour in";big=fmtDur(left);sub="phones off at "+fmtClock(w.start)+".";ring=left<3600000?1-left/3600000:0}
+      else if(w.phase==="during"){st="phone off, tune in";big=fmtDur(w.bed-now);sub="left in your quiet hour. bed at "+fmtClock(w.bed)+".";ring=(now-w.start)/3600000}
+      else{st="you made it";big="good night";sub="rest well. check in when you wake up.";ring=1}
+    }else if(tonight.p==="baseline"){
+      var logged=baselineLogged();
+      ring=logged/BASE_N;
+      if(hr>=4&&hr<12){st="rise gently";big="good morning";sub="have a beautiful, blessed day. baseline week: keep your usual routine and check in."}
+      else{st="baseline week";big="night "+tonight.n;sub="live your normal evening, phone and all. check in before bed. the experiment starts "+fmtShort(EXP_START)+"."}
+    }else if(tonight.p==="test"){
+      st="getting ready";big=Math.max(0,dayDiff(BASE_START,now))+" days";sub="your baseline week starts "+fmtShort(BASE_START)+".";ring=0;
+    }else{
+      st="all done";big="thank you";sub="the boring experiment has wrapped. see your results in insights and submit them.";ring=1;
     }
-    return box;
+    $("state").textContent=st;$("big").textContent=big;$("sub").textContent=sub;setRing(ring);
   }
-  function renderMenu(){
-    var c=$("cats");c.innerHTML="";
-    var cats=Object.assign({},MENU);if(S.mine.length)cats["my ideas"]=S.mine;
-    Object.keys(cats).forEach(function(cat){
-      var w=document.createElement("div");w.className="cat";
-      var h=document.createElement("h3");h.textContent=cat;w.appendChild(h);
-      var ul=document.createElement("ul");ul.className="ideas";
-      cats[cat].forEach(function(it){var li=document.createElement("li");if(cat==="my ideas")li.className="mine";li.textContent=it;ul.appendChild(li)});
-      w.appendChild(ul);
-      if(cat==="make")w.appendChild(promptBox());
-      c.appendChild(w);
-    });
-  }
-  function renderMorning(){setSeg("kept",S.m.kept);setSeg("wakeups",S.m.wakeups);setSeg("refreshed",S.m.refreshed)}
-  function renderEvening(){setSeg("focus",S.e.focus);setSeg("mood",S.e.mood);setSeg("energy",S.e.energy)}
 
-  // one dot per night: full when quiet hours were kept, half when partly
-  function renderStreak(pop){
-    var dots=$("dots");dots.innerHTML="";var kept=0,partly=0;
-    var now=new Date(),todayN=dayNum(now),practice=todayN<1;
-    var start=COHORT_START;
-    if(practice){var first=Object.keys(S.days).sort()[0];start=first?fromKey(first):addDays(new Date(now.getFullYear(),now.getMonth(),now.getDate()),-1)}
-    for(var i=1;i<=DAYS;i++){
-      var k=key(addDays(start,i-1)),m=entry(k).morning,s=document.createElement("span");
-      var v=m&&m.kept;
-      if(v==="yes"){s.className="full";kept++}else if(v==="partly"){s.className="half";partly++}
-      if(!practice&&i===todayN)s.classList.add("today");
-      if(pop===k)s.classList.add("pop");
+  function baselineLogged(){var c=0;for(var i=0;i<BASE_N;i++){if(morningDone(key(addDays(BASE_START,i))))c++}return c}
+
+  function renderDots(target,popKey){
+    var now=new Date(),tonight=phaseOf(now);
+    var dots=target,base=tonight.p==="baseline"||tonight.p==="test";
+    dots.innerHTML="";dots.className="dots"+(base?" base":"");
+    var kept=0,partly=0;
+    var n=base?BASE_N:DAYS,start=base?BASE_START:EXP_START;
+    for(var i=0;i<n;i++){
+      var k=key(addDays(start,i)),m=entry(k).morning,s=el("span");
+      if(base){if(morningDone(k))s.className="logged"}
+      else{var v=m&&m.kept;if(v==="yes"){s.className="full";kept++}else if(v==="partly"){s.className="half";partly++}}
+      if(k===cur.ek)s.classList.add("today");
+      if(popKey===k)s.classList.add("pop");
       dots.appendChild(s);
     }
-    var tail=partly?" · "+partly+" partly":"";
-    $("streakText").textContent = practice ? "practice run · kept "+kept+tail+". your 14 days start nov 9." : "you've kept your quiet hour "+kept+" of "+DAYS+" nights"+tail;
+    return {base:base,kept:kept,partly:partly};
   }
 
-  function celebrate(kind,k){
+  function renderStreak(popKey){
+    var r=renderDots($("dots"),popKey),lg=$("legend");lg.innerHTML="";
+    if(r.base){
+      $("streakText").textContent="baseline nights logged: "+baselineLogged()+" of "+BASE_N;
+      $("streakNote").textContent="experiment starts "+fmtMD(EXP_START);
+      var a=el("span");var i=el("i");i.style.background="var(--muted)";a.appendChild(i);a.appendChild(document.createTextNode("morning check-in done"));lg.appendChild(a);
+    }else{
+      $("streakText").textContent="you've kept your quiet hour "+r.kept+" of "+DAYS+" nights";
+      $("streakNote").textContent=r.partly?r.partly+" partly":"";
+      [["var(--lav)","kept"],["linear-gradient(90deg,var(--rust) 50%,transparent 50%)","partly"]].forEach(function(x){var a=el("span"),i=el("i");i.style.background=x[0];if(x[1]==="partly")i.style.border="1px solid var(--rust)";a.appendChild(i);a.appendChild(document.createTextNode(x[1]));lg.appendChild(a)});
+    }
+  }
+
+  var ICON={
+    moon:'<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
+    sun:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+    check:'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
+  };
+  function renderCards(){
+    var c=$("cards");c.innerHTML="";
+    var hr=new Date().getHours(),morningFirst=hr<15;
+    var items=[
+      {kind:"evening",title:"evening",sub:"focus, mood, energy",done:eveningDone(cur.ek),icon:"moon"},
+      {kind:"morning",title:"morning",sub:"last night's sleep",done:morningDone(cur.mk),icon:"sun"}
+    ];
+    var nextKind=morningFirst?(!items[1].done?"morning":!items[0].done?"evening":null):(!items[0].done?"evening":!items[1].done?"morning":null);
+    items.forEach(function(it){
+      var b=el("button","card"+(it.done?" done":"")+(it.kind===nextKind?" next":""));b.type="button";
+      var ic=el("span","cardicon");ic.innerHTML=it.done?ICON.check:ICON[it.icon];b.appendChild(ic);
+      b.appendChild(el("h3",null,it.title+" check-in"));
+      b.appendChild(el("span","note",it.sub));
+      b.appendChild(el("span","go",it.done?"done · tap to edit":"start →"));
+      b.addEventListener("click",function(){openFlow(it.kind)});
+      c.appendChild(b);
+    });
+  }
+
+  function renderToday(){
+    var hr=new Date().getHours(),nm=S.name.trim();
+    $("greet").textContent=(hr>=4&&hr<12?"good morning":hr<17&&hr>=12?"good afternoon":"good evening")+(nm?", "+nm.toLowerCase():"");
+    var ph=phaseOf(new Date()),pill=$("phasePill");
+    pill.className="pill"+(ph.p==="experiment"?"":" base");
+    pill.textContent=ph.p==="experiment"?"the boring experiment · day "+ph.n+" of "+DAYS:ph.p==="baseline"?"baseline week · night "+ph.n+" of "+BASE_N:ph.p==="test"?"baseline starts "+fmtMD(BASE_START):"the boring experiment · finished";
+    renderHero();renderCards();renderStreak();
+  }
+
+  // ---- check-in flow ----
+  var F=null;
+  function scaleOpts(id){return SCALES[id].map(function(l,i){return {v:String(i+1),num:String(i+1),label:l}})}
+  function buildSteps(kind,k){
+    var ph=phaseOf(fromKey(k)),steps=[];
+    if(kind==="evening"){
+      steps.push({id:"focus",type:"choice",q:"how focused did you feel today?",opts:scaleOpts("focus")});
+      steps.push({id:"mood",type:"choice",q:"what was your mood like today?",opts:scaleOpts("mood")});
+      steps.push({id:"energy",type:"choice",q:"what was your energy level today?",opts:scaleOpts("energy")});
+      steps.push({id:"note",type:"text",q:"anything you noticed about today?",ph:"optional. reached for my phone less after dinner."});
+    }else{
+      if(ph.p==="experiment"||ph.p==="after")steps.push({id:"kept",type:"choice",q:"did you keep your quiet hour last night?",opts:[{v:"yes",label:"yes",hint:"phone off the whole hour"},{v:"partly",label:"partly",hint:"some of the hour"},{v:"no",label:"not really",hint:"tonight's a new night"}]});
+      steps.push({id:"slept",type:"time",q:"when did you fall asleep?",hint:"your best guess is fine."});
+      steps.push({id:"woke",type:"time",q:"when did you wake up?"});
+      steps.push({id:"wakeups",type:"choice",q:"how many times did you wake up in the night?",opts:[{v:"0",num:"0",label:"slept through"},{v:"1",num:"1",label:"once"},{v:"2",num:"2",label:"twice"},{v:"3+",num:"3+",label:"three or more"}]});
+      steps.push({id:"refreshed",type:"choice",q:"how refreshed do you feel?",opts:scaleOpts("refreshed")});
+    }
+    return steps;
+  }
+  function openFlow(kind){
+    var k=kind==="evening"?cur.ek:cur.mk;
+    var saved=Object.assign({},(entry(k)[kind])||{});
+    ["focus","mood","energy"].forEach(function(f){if(saved[f]!=null)saved[f]=String(saved[f])});
+    F={kind:kind,k:k,steps:buildSteps(kind,k),i:0,A:saved};
+    $("flow").hidden=false;document.documentElement.style.overflow="hidden";renderStep();
+  }
+  function closeFlow(){$("flow").hidden=true;document.documentElement.style.overflow="";F=null;renderToday();renderInsights()}
+  function ctxLine(){var ph=phaseOf(fromKey(F.k));return (F.kind==="evening"?"evening · ":"morning · about last night · ")+(ph.p==="experiment"?"day "+ph.n:ph.p==="baseline"?"baseline night "+ph.n:fmtMD(fromKey(F.k)))}
+  function flowTop(inner,showBack){
+    var top=el("div","flowtop");
+    var back=el("button","iconbtn");back.type="button";back.setAttribute("aria-label",showBack?"back":"close");
+    back.innerHTML=showBack?'<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>':'<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    back.addEventListener("click",function(){if(showBack){F.i--;renderStep()}else closeFlow()});
+    top.appendChild(back);
+    var pg=el("div","prog");pg.style.setProperty("--n",F.steps.length);
+    for(var i=0;i<F.steps.length;i++){var b=el("i");if(i<=F.i)b.className="on";pg.appendChild(b)}
+    top.appendChild(pg);
+    if(showBack){var x=el("button","iconbtn");x.type="button";x.setAttribute("aria-label","close");x.innerHTML='<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';x.addEventListener("click",closeFlow);top.appendChild(x)}
+    inner.appendChild(top);
+  }
+  function next(){if(F.i<F.steps.length-1){F.i++;renderStep()}else finishFlow()}
+  function renderStep(){
+    var inner=$("flowInner");inner.innerHTML="";
+    var s=F.steps[F.i];
+    flowTop(inner,F.i>0);
+    inner.appendChild(el("span","ctx",ctxLine()));
+    var q=el("h2","q",s.q);q.id="flowQ";inner.appendChild(q);
+    if(s.hint)inner.appendChild(el("p","note",s.hint));
+    if(s.type==="choice"){
+      var box=el("div","opts");
+      s.opts.forEach(function(o){
+        var b=el("button","opt");b.type="button";b.setAttribute("aria-pressed",F.A[s.id]===o.v?"true":"false");
+        if(o.num){b.appendChild(el("span","num",o.num))}
+        var l=el("span","lbl");l.appendChild(el("span",null,o.label));if(o.hint)l.appendChild(el("small",null,o.hint));b.appendChild(l);
+        b.addEventListener("click",function(){
+          var was=F.A[s.id];F.A[s.id]=o.v;
+          [].forEach.call(box.children,function(x){x.setAttribute("aria-pressed","false")});b.setAttribute("aria-pressed","true");
+          if(s.id==="kept"){upsert(F.k,"morning",{kept:o.v});if(o.v!==was&&(o.v==="yes"||o.v==="partly"))celebrate(o.v)}
+          setTimeout(next,s.id==="kept"&&o.v!=="no"?650:240);
+        });
+        box.appendChild(b);
+      });
+      inner.appendChild(box);
+    }else if(s.type==="time"){
+      var tb=el("div","timebox");var inp=el("input");inp.type="time";inp.id="flowTime";inp.value=F.A[s.id]||(s.id==="slept"?S.bedtime:"");inp.setAttribute("aria-labelledby","flowQ");
+      tb.appendChild(inp);inner.appendChild(tb);
+      inner.appendChild(el("div","spacer"));
+      var nb=el("button","btn wide","next");nb.type="button";nb.addEventListener("click",function(){F.A[s.id]=inp.value;next()});inner.appendChild(nb);
+      var sk=el("button","linkbtn","skip");sk.type="button";sk.style.alignSelf="center";sk.addEventListener("click",function(){F.A[s.id]="";next()});inner.appendChild(sk);
+    }else{
+      var ta=el("textarea");ta.id="flowNote";ta.maxLength=400;ta.placeholder=s.ph;ta.value=F.A[s.id]||"";ta.setAttribute("aria-labelledby","flowQ");inner.appendChild(ta);
+      inner.appendChild(el("div","spacer"));
+      var sb=el("button","btn wide","save check-in");sb.type="button";sb.addEventListener("click",function(){F.A.note=ta.value.trim();finishFlow()});inner.appendChild(sb);
+    }
+  }
+  function finishFlow(){
+    var A=F.A,ph=phaseOf(fromKey(F.k)),title="",msg="",dots=false,still=reduced();
+    if(F.kind==="evening"){
+      upsert(F.k,"evening",{focus:+A.focus,mood:+A.mood,energy:+A.energy,note:A.note||""});
+      title="check-in saved.";
+      msg=ph.p==="experiment"?"your quiet hour starts at "+fmtClock(windowNow(new Date()).start)+". phone off, tune in.":ph.p==="baseline"?"enjoy your normal evening. see you in the morning.":"see you in the morning.";
+    }else{
+      var m={slept:A.slept||"",woke:A.woke||"",wakeups:A.wakeups||null,refreshed:A.refreshed||null};
+      if(A.kept)m.kept=A.kept;
+      upsert(F.k,"morning",m);
+      if(ph.p==="experiment"){dots=true;title=A.kept==="yes"?"you kept your quiet hour.":A.kept==="partly"?"partly counts.":"thanks for being honest.";msg=A.kept==="no"?"tonight's a new night. have a beautiful, blessed day.":"have a beautiful, blessed day."}
+      else{title="baseline night logged.";msg="have a beautiful, blessed day.";if(!still)confetti(40)}
+    }
+    var inner=$("flowInner");inner.innerHTML="";inner.className="inner fin";
+    var ck=el("div","check");ck.innerHTML=ICON.check;inner.appendChild(ck);
+    inner.appendChild(el("h2","q",title));
+    inner.appendChild(el("p","sub",msg));
+    if(dots){var d=el("div","dots");inner.appendChild(d);setTimeout(function(){renderDots(d,F&&F.k)},still?0:300)}
+    var b=el("button","btn wide","done");b.type="button";b.addEventListener("click",function(){inner.className="inner";closeFlow()});inner.appendChild(b);
+  }
+  function reduced(){return !!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)}
+
+  function celebrate(kind){
     try{if(navigator.vibrate)navigator.vibrate(kind==="yes"?[60,40,140]:[70])}catch(e){}
     var c=$("cheer");c.className="cheer"+(kind==="partly"?" partly":"");
     c.textContent=kind==="yes"?"you kept your quiet hour. dot added.":"partly counts. half dot added.";
     requestAnimationFrame(function(){c.classList.add("show")});
-    clearTimeout(c._t);c._t=setTimeout(function(){c.classList.remove("show")},3200);
-    var still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if(!still)confetti(kind==="yes"?150:55);
-    setTimeout(function(){
-      try{$("dots").scrollIntoView({behavior:still?"auto":"smooth",block:"center"})}catch(e){}
-      setTimeout(function(){renderStreak(k)},still?0:450);
-    },700);
+    clearTimeout(c._t);c._t=setTimeout(function(){c.classList.remove("show")},3000);
+    if(!reduced())confetti(kind==="yes"?150:55);
   }
-
   function confetti(count){
-    var cv=$("confetti"),ctx=cv.getContext("2d"),dpr=window.devicePixelRatio||1;
-    var W=innerWidth,H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
-    var cs=getComputedStyle(document.documentElement);
-    var cols=[cs.getPropertyValue("--rust").trim(),cs.getPropertyValue("--lav").trim(),"#fff8c5",cs.getPropertyValue("--ink").trim()];
-    var ps=[];for(var i=0;i<count;i++){ps.push({x:W/2+(Math.random()-.5)*W*.3,y:H*.7,vx:(Math.random()-.5)*12,vy:-(8+Math.random()*10),r:4+Math.random()*5,a:Math.random()*6,va:(Math.random()-.5)*.3,c:cols[i%cols.length]})}
+    var cv=$("confetti"),ctx=cv.getContext("2d"),dpr=window.devicePixelRatio||1,W=innerWidth,H=innerHeight;
+    cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+    var cols=["#792920","#b3bcff","#fff8c5","#e0897d"];
+    var ps=[];for(var i=0;i<count;i++)ps.push({x:W/2+(Math.random()-.5)*W*.3,y:H*.7,vx:(Math.random()-.5)*12,vy:-(8+Math.random()*10),r:4+Math.random()*5,a:Math.random()*6,va:(Math.random()-.5)*.3,c:cols[i%cols.length]});
     var t0=performance.now();
-    (function step(t){
-      ctx.clearRect(0,0,W,H);
-      ps.forEach(function(p){p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.a+=p.va;
-        ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);ctx.restore()});
-      if(t-t0<2600)requestAnimationFrame(step);else ctx.clearRect(0,0,W,H);
-    })(t0);
+    (function step(t){ctx.clearRect(0,0,W,H);
+      ps.forEach(function(p){p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.a+=p.va;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);ctx.restore()});
+      if(t-t0<2600)requestAnimationFrame(step);else ctx.clearRect(0,0,W,H)})(t0);
   }
 
+  // ---- ideas ----
+  function promptBox(){
+    var box=el("div","jp");
+    var t=el("button","linkbtn",S.promptOpen?"hide journal prompt":"need a journal prompt?");t.type="button";t.setAttribute("aria-expanded",S.promptOpen?"true":"false");
+    t.addEventListener("click",function(){S.promptOpen=!S.promptOpen;renderIdeas()});box.appendChild(t);
+    if(S.promptOpen){box.appendChild(el("p",null,PROMPTS[S.promptI]));var n=el("button","linkbtn","another prompt");n.type="button";n.addEventListener("click",function(){S.promptI=(S.promptI+1)%PROMPTS.length;renderIdeas()});box.appendChild(n)}
+    return box;
+  }
+  function renderIdeas(){
+    var c=$("cats");c.innerHTML="";
+    var cats=Object.assign({},MENU);if(S.mine.length)cats["my ideas"]=S.mine;
+    Object.keys(cats).forEach(function(cat){
+      var w=el("div","cat");w.appendChild(el("h3",null,cat));
+      var ul=el("ul","ideas");cats[cat].forEach(function(it){ul.appendChild(el("li",cat==="my ideas"?"mine":null,it))});w.appendChild(ul);
+      if(cat==="make")w.appendChild(promptBox());
+      c.appendChild(w);
+    });
+  }
+
+  // ---- insights ----
+  function sleepHrs(m){if(!m||!m.slept||!m.woke)return null;var d=toMin(m.woke)-toMin(m.slept);if(d<=0)d+=1440;if(d<120||d>16*60)return null;return d/60}
+  function avg(a){a=a.filter(function(x){return x!=null&&!isNaN(x)});return a.length?a.reduce(function(s,x){return s+x},0)/a.length:null}
+  function agg(phase){
+    var r={sleep:[],wake:[],ref:[],focus:[],mood:[],energy:[],kept:0,partly:0,nights:0};
+    Object.keys(S.days).forEach(function(k){
+      if(phaseOf(fromKey(k)).p!==phase)return;
+      var e=S.days[k],m=e.morning,ev=e.evening;
+      if(m||ev)r.nights++;
+      if(m){r.sleep.push(sleepHrs(m));if(m.wakeups!=null&&m.wakeups!=="")r.wake.push(m.wakeups==="3+"?3:+m.wakeups);if(m.refreshed)r.ref.push(+m.refreshed);if(m.kept==="yes")r.kept++;if(m.kept==="partly")r.partly++}
+      if(ev&&ev.focus!=null){r.focus.push(+ev.focus);r.mood.push(+ev.mood);r.energy.push(+ev.energy)}
+    });
+    return {sleep:avg(r.sleep),wake:avg(r.wake),ref:avg(r.ref),focus:avg(r.focus),mood:avg(r.mood),energy:avg(r.energy),kept:r.kept,partly:r.partly,nights:r.nights};
+  }
+  function f1(x){return x==null?"—":(Math.round(x*10)/10).toFixed(1)}
+  var METRICS=[
+    {k:"sleep",label:"sleep",fmt:fmtHM,diff:function(d){var m=Math.round(d*60);return (m>0?"+":"")+m+" min"}},
+    {k:"ref",label:"refreshed",unit:"/5",fmt:f1},
+    {k:"focus",label:"focus",unit:"/6",fmt:f1},
+    {k:"mood",label:"mood",unit:"/6",fmt:f1},
+    {k:"energy",label:"energy",unit:"/6",fmt:f1},
+    {k:"wake",label:"woke in night",unit:"×",fmt:f1}
+  ];
+  function leadText(b,x){
+    function part(a){var bits=[];if(a.sleep!=null)bits.push("your average sleep is "+fmtHM(a.sleep));if(a.mood!=null)bits.push("your average mood is "+f1(a.mood)+" of 6");if(a.energy!=null)bits.push("your average energy is "+f1(a.energy)+" of 6");if(a.focus!=null)bits.push("your average focus is "+f1(a.focus)+" of 6");return bits}
+    if(x.nights){
+      var t="during the experiment, "+(part(x).join(", ")||"you haven't logged scores yet")+".";
+      if(b.sleep!=null&&x.sleep!=null){var dm=Math.round((x.sleep-b.sleep)*60);if(Math.abs(dm)>=5)t+=" that's "+Math.abs(dm)+" min "+(dm>0?"more":"less")+" sleep than your baseline week."}
+      if(b.mood!=null&&x.mood!=null){var dd=x.mood-b.mood;if(Math.abs(dd)>=.3)t+=" your mood is "+f1(Math.abs(dd))+" points "+(dd>0?"higher":"lower")+"."}
+      return t;
+    }
+    if(b.nights)return "in your baseline week, "+(part(b).join(", ")||"you haven't logged scores yet")+". these are your \"before\" numbers.";
+    return "your averages will show up here after your first check-ins.";
+  }
+  function renderInsights(){
+    var b=agg("baseline"),x=agg("experiment"),show=x.nights?x:b;
+    var t=$("tiles");t.innerHTML="";
+    if(x.nights||phaseOf(new Date()).p==="experiment"){
+      var kt=el("div","tile kept");kt.appendChild(el("span","eyebrow","quiet hours kept"));
+      var v=el("span","v",String(x.kept));v.appendChild(el("small",null,"of "+DAYS));kt.appendChild(v);
+      kt.appendChild(el("span","d",x.partly?x.partly+" partly kept":"keep going"));t.appendChild(kt);
+    }
+    METRICS.forEach(function(mt){
+      var tile=el("div","tile");tile.appendChild(el("span","eyebrow","avg "+mt.label));
+      var val=show[mt.k],v=el("span","v",mt.k==="sleep"?fmtHM(val):f1(val));
+      if(mt.unit&&val!=null)v.appendChild(el("small",null,mt.unit));tile.appendChild(v);
+      var dl="baseline week";
+      if(x.nights){var bv=b[mt.k];
+        if(bv==null)dl="experiment";
+        else{var dd=val==null?null:val-bv;dl="baseline "+(mt.k==="sleep"?fmtHM(bv):f1(bv))+(dd==null?"":" · "+(mt.diff?mt.diff(dd):(dd>0?"+":"")+f1(dd)))}}
+      tile.appendChild(el("span","d",dl));
+      t.appendChild(tile);
+    });
+    var tb=$("cmp");tb.innerHTML="";
+    var hr=el("tr");["","baseline","experiment","change"].forEach(function(h){hr.appendChild(el("th",null,h))});tb.appendChild(hr);
+    METRICS.forEach(function(mt){
+      var tr=el("tr"),bv=b[mt.k],xv=x[mt.k];
+      tr.appendChild(el("td",null,mt.label));
+      tr.appendChild(el("td",null,bv==null?"—":mt.fmt(bv)+(mt.unit&&mt.k!=="sleep"?"":"")));
+      tr.appendChild(el("td",null,xv==null?"—":mt.fmt(xv)));
+      var ch="—";if(bv!=null&&xv!=null){var d=xv-bv;ch=mt.diff?mt.diff(d):(d>0?"+":"")+f1(d)}
+      tr.appendChild(el("td","ch",ch));tb.appendChild(tr);
+    });
+    renderLog();
+    var ss=$("submitSteps");ss.innerHTML="";
+    ["after your final morning check-in on "+fmtShort(addDays(EXP_START,DAYS))+", tap copy my results.","tap submit on form and paste them in. your averages are included."].forEach(function(s){ss.appendChild(el("li",null,s))});
+  }
   function renderLog(){
     var ul=$("log");ul.innerHTML="";
     var keys=Object.keys(S.days).sort().reverse();
-    if(!keys.length){var li=document.createElement("li");li.style.display="block";var p=document.createElement("p");p.className="empty";p.textContent="your first check-in will show up here.";li.appendChild(p);ul.appendChild(li);return}
+    if(!keys.length){var li=el("li");li.style.display="block";li.appendChild(el("p","empty","your first check-in will show up here."));ul.appendChild(li);return}
     keys.forEach(function(k){
-      var e=S.days[k],d0=fromKey(k),li=document.createElement("li");
-      var n=document.createElement("div");n.className="n";n.textContent=dayName(dayNum(d0),d0);
-      var d=document.createElement("div");d.className="d";
-      function line(t,cls){var x=document.createElement(cls==="i"?"i":"div");if(cls==="note")x.className="note";x.textContent=t;d.appendChild(x)}
-      var ev=e.evening;
-      if(ev&&ev.focus!=null){line("focus "+ev.focus+" · mood "+ev.mood+" · energy "+ev.energy+" (of 6)");if(ev.note)line(ev.note,"i")}
-      if(e.morning){var m=e.morning;
-        line("quiet hour: "+({yes:"kept",partly:"partly",no:"not really"}[m.kept]||"—"));
-        line("sleep: "+(m.slept||"?")+" → "+(m.woke||"?")+" · woke "+(m.wakeups||"?")+"× · refreshed "+(m.refreshed||"?")+"/5","note");
-      }else line("morning check-in still to come","note");
-      li.appendChild(n);li.appendChild(d);ul.appendChild(li);
+      var e=S.days[k],li=el("li"),d=el("div","d");
+      li.appendChild(el("div","n",nightName(k)));
+      var ev=e.evening,m=e.morning;
+      if(ev&&ev.focus!=null){d.appendChild(el("div",null,"focus "+ev.focus+" · mood "+ev.mood+" · energy "+ev.energy+" (of 6)"));if(ev.note)d.appendChild(el("i",null,ev.note))}
+      if(m){
+        if(m.kept)d.appendChild(el("div",null,"quiet hour: "+({yes:"kept",partly:"partly",no:"not really"}[m.kept])));
+        d.appendChild(el("div","note","sleep "+fmtHM(sleepHrs(m))+" · woke "+(m.wakeups||"?")+"× · refreshed "+(m.refreshed||"?")+"/5"));
+      }else d.appendChild(el("div","note","morning check-in still to come"));
+      li.appendChild(d);ul.appendChild(li);
     });
   }
-  function renderAll(){renderMenu();renderMorning();renderEvening();renderStreak();renderLog()}
-
-  function upsert(k,part,val){var e=Object.assign({},S.days[k]||{});e[part]=val;S.days[k]=e;save("days",S.days)}
-  function morningData(){return {kept:S.m.kept,slept:$("slept").value,woke:$("woke").value,wakeups:S.m.wakeups,refreshed:S.m.refreshed}}
-
-  function segHandler(id,field){[].forEach.call($(id).children,function(b){b.addEventListener("click",function(){S.m[field]=S.m[field]===b.dataset.v?null:b.dataset.v;renderMorning()})})}
-  // tapping yes or partly saves right away and celebrates
-  [].forEach.call($("kept").children,function(b){b.addEventListener("click",function(){
-    var v=b.dataset.v,was=S.m.kept;S.m.kept=v;renderMorning();
-    upsert(cur.morningKey,"morning",morningData());
-    renderLog();
-    if(v!==was&&(v==="yes"||v==="partly"))celebrate(v,cur.morningKey);else renderStreak();
-  })});
-  segHandler("wakeups","wakeups");segHandler("refreshed","refreshed");
-
-  $("saveMorning").addEventListener("click",function(){
-    if(!S.m.kept||!S.m.refreshed){$("mToast").textContent="answer your quiet hour and how refreshed you feel to save.";return}
-    upsert(cur.morningKey,"morning",morningData());
-    $("mToast").textContent="saved. have a good day.";loadEntries();
-  });
-  $("saveEvening").addEventListener("click",function(){
-    if(S.e.focus==null||S.e.mood==null||S.e.energy==null){$("eToast").textContent="answer focus, mood and energy to save.";return}
-    upsert(cur.eveningKey,"evening",{focus:+S.e.focus,mood:+S.e.mood,energy:+S.e.energy,note:$("eNote").value.trim()});
-    $("eToast").textContent="saved. time to turn your phone off soon.";loadEntries();
-  });
-
-  function showTab(which){
-    var m=which==="morning";
-    $("tabMorning").setAttribute("aria-selected",m?"true":"false");$("tabEvening").setAttribute("aria-selected",m?"false":"true");
-    $("morningPanel").hidden=!m;$("eveningPanel").hidden=m;
+  function csvCell(v){v=v==null?"":String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+  function exportText(){
+    var name=S.name.trim()||"(no name)",b=agg("baseline"),x=agg("experiment");
+    function line(a){return "sleep "+fmtHM(a.sleep)+", refreshed "+f1(a.ref)+"/5, focus "+f1(a.focus)+"/6, mood "+f1(a.mood)+"/6, energy "+f1(a.energy)+"/6, woke in night "+f1(a.wake)+"x ("+a.nights+" nights)"}
+    var out=["the boring experiment results","name: "+name,"baseline averages: "+line(b),"experiment averages: "+line(x),"quiet hours kept: "+x.kept+" of "+DAYS+", partly "+x.partly,""];
+    var rows=[["name","phase","night","day","focus_1to6","mood_1to6","energy_1to6","noticed_today","kept_quiet_hour","fell_asleep","woke_up","sleep_hours","wakeups","refreshed_1to5"]];
+    Object.keys(S.days).sort().forEach(function(k){
+      var e=S.days[k],ev=e.evening||{},m=e.morning||{},ph=phaseOf(fromKey(k)),sh=sleepHrs(m);
+      rows.push([name,ph.p,k,ph.n||"",ev.focus,ev.mood,ev.energy,ev.note||"",m.kept||"",m.slept||"",m.woke||"",sh==null?"":sh.toFixed(2),m.wakeups||"",m.refreshed||""]);
+    });
+    return out.join("\n")+rows.map(function(r){return r.map(csvCell).join(",")}).join("\n");
   }
-  $("tabMorning").addEventListener("click",function(){showTab("morning")});
-  $("tabEvening").addEventListener("click",function(){showTab("evening")});
-  showTab(new Date().getHours()<15?"morning":"evening");
+  $("formLink").href=FORM;
+  $("exportBtn").addEventListener("click",function(){
+    var t=exportText(),box=$("exportBox");box.value=t;
+    var fb=function(){box.hidden=false;box.focus();box.select();$("xToast").textContent="your results are selected below. copy them, then tap submit on form and paste them in."};
+    try{navigator.clipboard.writeText(t).then(function(){$("xToast").textContent="copied. now tap submit on form and paste it in."},fb)}catch(e){fb()}
+  });
 
-  $("bedtime").addEventListener("change",function(){if(!this.value)return;S.bedtime=this.value;save("bedtime",S.bedtime);tick()});
-  $("name").addEventListener("input",function(){S.name=this.value;save("name",S.name)});
+  // ---- tabs ----
+  var tabs=document.querySelectorAll(".tabbar button");
+  function showView(id){
+    ["vToday","vIdeas","vInsights"].forEach(function(v){$(v).hidden=v!==id});
+    [].forEach.call(tabs,function(t){t.setAttribute("aria-selected",t.dataset.view===id?"true":"false")});
+    if(id==="vInsights")renderInsights();
+    window.scrollTo(0,0);
+  }
+  [].forEach.call(tabs,function(t){t.addEventListener("click",function(){showView(t.dataset.view)})});
 
+  // ---- ideas actions ----
   $("pickBtn").addEventListener("click",function(){
     var all=[].concat.apply([],Object.keys(MENU).map(function(k){return MENU[k]})).concat(S.mine);
     var c=$("pickText").textContent,n=c;while(n===c&&all.length>1)n=all[Math.floor(Math.random()*all.length)];$("pickText").textContent=n;
   });
-
-  function addIdea(){var v=$("addIdea").value.trim().toLowerCase();if(!v)return;if(S.mine.indexOf(v)<0){S.mine.push(v);save("mine",S.mine)}$("addIdea").value="";renderMenu()}
+  function addIdea(){var v=$("addIdea").value.trim().toLowerCase();if(!v)return;if(S.mine.indexOf(v)<0){S.mine.push(v);save("mine",S.mine)}$("addIdea").value="";renderIdeas()}
   $("addBtn").addEventListener("click",addIdea);
   $("addIdea").addEventListener("keydown",function(e){if(e.key==="Enter")addIdea()});
 
-  function csvCell(v){v=v==null?"":String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
-  function exportText(){
-    var name=$("name").value.trim()||"(no name)";
-    var rows=[["name","night","day","focus_1to6","mood_1to6","energy_1to6","noticed_today","kept_quiet_hours","fell_asleep","woke_up","wakeups","refreshed_1to5"]];
-    Object.keys(S.days).sort().forEach(function(k){
-      var e=S.days[k],ev=e.evening||{},m=e.morning||{},n=dayNum(fromKey(k));
-      rows.push([name,k,(n>=1&&n<=DAYS)?n:"practice",ev.focus,ev.mood,ev.energy,ev.note||"",m.kept||"",m.slept||"",m.woke||"",m.wakeups||"",m.refreshed||""]);
+  // ---- settings & welcome ----
+  function lockScroll(on){document.documentElement.style.overflow=on?"hidden":""}
+  $("openSettings").addEventListener("click",function(){$("sName").value=S.name;$("sBed").value=S.bedtime;$("settings").hidden=false;lockScroll(true)});
+  $("closeSettings").addEventListener("click",function(){$("settings").hidden=true;lockScroll(false)});
+  $("saveSettings").addEventListener("click",function(){S.name=$("sName").value.trim();save("name",S.name);if($("sBed").value){S.bedtime=$("sBed").value;save("bedtime",S.bedtime)}$("settings").hidden=true;lockScroll(false);renderToday()});
+  $("aboutBtn").addEventListener("click",function(){$("settings").hidden=true;openWelcome()});
+
+  function renderTimeline(){
+    var tl=$("timeline");tl.innerHTML="";
+    var lastBase=addDays(EXP_START,-1),lastExp=addDays(EXP_START,DAYS-1),final=addDays(EXP_START,DAYS);
+    [["baseline week",fmtMD(BASE_START)+"–"+fmtMD(lastBase),"live your normal evenings. check in morning and night so we have your \"before.\""],
+     ["the experiment",fmtMD(EXP_START)+"–"+fmtMD(lastExp),"phone off an hour before bed. check in morning and night."],
+     ["wrap up",fmtMD(final),"last morning check-in, then submit your results."]].forEach(function(r){
+      var li=el("li"),b=el("b",null,r[0]);b.appendChild(el("span",null,r[1]));li.appendChild(b);li.appendChild(el("span",null,r[2]));tl.appendChild(li);
     });
-    return "the boring experiment results\n"+rows.map(function(r){return r.map(csvCell).join(",")}).join("\n");
+    var ph=phaseOf(new Date());
+    $("wStarts").textContent=ph.p==="test"?"baseline week starts "+fmtShort(BASE_START)+". get ready.":ph.p==="baseline"?"baseline week is on: night "+ph.n+" of "+BASE_N+". the experiment starts "+fmtShort(EXP_START)+".":ph.p==="experiment"?"the experiment has started. today is day "+ph.n+" of "+DAYS+". jump in tonight.":"the boring experiment has wrapped. thank you for being part of it.";
   }
-  $("exportBtn").addEventListener("click",function(){
-    var t=exportText(),box=$("exportBox");box.value=t;
-    var fallback=function(){box.hidden=false;box.focus();box.select();$("xToast").textContent="your results are selected below. copy them, then tap submit on form and paste them in."};
-    try{navigator.clipboard.writeText(t).then(function(){$("xToast").textContent="copied. now tap submit on form and paste it in."},fallback)}catch(e){fallback()}
-  });
-
-
-  // one-time welcome; reopen from the footer
-  function openWelcome(){$("wName").value=$("name").value;$("wBed").value=S.bedtime;$("welcome").hidden=false;document.documentElement.style.overflow="hidden";try{$("welcome").scrollTop=0}catch(e){}}
-  function closeWelcome(){$("welcome").hidden=true;document.documentElement.style.overflow=""}
+  function openWelcome(){renderTimeline();$("wName").value=S.name;$("wBed").value=S.bedtime;$("welcome").hidden=false;lockScroll(true);try{$("welcome").scrollTop=0}catch(e){}}
   $("wGo").addEventListener("click",function(){
     var n=$("wName").value.trim(),b=$("wBed").value;
-    if(n){$("name").value=n;S.name=n;save("name",n)}
-    if(b){S.bedtime=b;$("bedtime").value=b;save("bedtime",b)}
-    save("welcomed",true);closeWelcome();tick();
+    if(n){S.name=n;save("name",n)}if(b){S.bedtime=b;save("bedtime",b)}
+    save("welcomed2",true);$("welcome").hidden=true;lockScroll(false);renderToday();
   });
-  $("aboutBtn").addEventListener("click",openWelcome);
-  if(!load("welcomed",false))openWelcome();
-  tick();setInterval(tick,1000);
+
+  // ---- start ----
+  function tick(){var k=keysNow();if(k.ek!==cur.ek||k.mk!==cur.mk){cur=k;renderToday()}else renderHero()}
+  cur=keysNow();renderToday();renderIdeas();renderInsights();
+  if(!load("welcomed2",false))openWelcome();
+  setInterval(tick,1000);
 })();
 </script>
 </body>
